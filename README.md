@@ -1,4 +1,4 @@
-php-nagios-json
+PHP Nagios JSON
 ===============
 
 Script to parse Nagios status.dat and present it as JSON,
