@@ -55,11 +55,9 @@ function outputJson($hosts, $services, $program)
     if ($program != "") {
         echo '  "programStatus": {' . "\n";
         foreach ($program as $key => $val) {
-            $key = jsonString($key);
-            $val = jsonString($val);
-            echo '    "' . $key . '": "' . $val . '"' . (isLast($program, $key) ? '' : ',') . "\n";
+            echo '    "' . jsonString($key) . '": "' . jsonString($val) . '"' . (isLast($program, $key) ? '' : ',') . "\n";
         }
-        unset($key, $value);
+        unset($key, $val);
         echo '  },' . "\n";
     }
 
@@ -68,11 +66,9 @@ function outputJson($hosts, $services, $program)
     foreach ($hosts as $hostName => $hostArray) {
         echo '   "' . jsonString($hostName) . '": {' . "\n";
         foreach ($hostArray as $key => $val) {
-            $key = jsonString($key);
-            $val = jsonString($val);
-            echo '      "' . $key . '": "' . $val . '"' . (isLast($hostArray, $key) ? '' : ',') . "\n";
+            echo '      "' . jsonString($key) . '": "' . jsonString($val) . '"' . (isLast($hostArray, $key) ? '' : ',') . "\n";
         }
-        unset($key, $value);
+        unset($key, $val);
         echo '   }' . (isLast($hosts, $hostName) ? '' : ',') . "\n";
     }
     unset($hostName, $hostArray);
@@ -84,11 +80,9 @@ function outputJson($hosts, $services, $program)
         foreach ($service as $serviceDesc => $serviceArray) {
             echo '   "' . jsonString($serviceDesc) . '": {' . "\n";
             foreach ($serviceArray as $key => $val) {
-                $key = jsonString($key);
-                $val = jsonString($val);
-                echo '      "' . $key . '": "' . $val . '"' . (isLast($serviceArray, $key) ? '' : ',') . "\n";
+                echo '      "' . jsonString($key) . '": "' . jsonString($val) . '"' . (isLast($serviceArray, $key) ? '' : ',') . "\n";
             }
-            unset($key, $value);
+            unset($key, $val);
             echo '   }' . (isLast($service, $serviceDesc) ? '' : ',') . "\n";
         }
         unset($serviceDesc, $serviceArray);
