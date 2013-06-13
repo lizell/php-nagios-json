@@ -83,7 +83,7 @@ function outputJson($hosts, $services, $program)
                 echo '      "' . jsonString($key) . '": "' . jsonString($val) . '"' . (isLast($serviceArray, $key) ? '' : ',') . "\n";
             }
             unset($key, $val);
-            echo '   }' . (isLast($service, $serviceDesc) ? '' : ',') . "\n";
+            echo '   }' . (isLast($service, $serviceDesc) && isLast($services, $hostName) ? '' : ',') . "\n";
         }
         unset($serviceDesc, $serviceArray);
     }
