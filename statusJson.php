@@ -25,15 +25,17 @@
 // Change this accordingly
 $statusFile = "/opt/local/var/nagios/status.dat";
 
-$nag_version = getFileVersion($statusFile); // returns integer 2 or 3
+$nag_version = getFileVersion($statusFile);
 $created_ts = 0;
 
 $debug = false;
 
-if ($nag_version == 3) {
-    $data = getData3($statusFile); // returns an array
+if ($nag_version == 4) {
+    $data = getData4($statusFile);
+} else if ($nag_version == 3) {
+    $data = getData3($statusFile);
 } else {
-    $data = getData2($statusFile); // returns an array
+    $data = getData2($statusFile);
 }
 
 $hosts = $data['hosts'];
@@ -134,9 +136,7 @@ function getFileVersion($statusFile)
             if (trim($vals[0]) == "created") {
                 $created = $vals[1];
             } elseif (trim($vals[0]) == "version") {
-                if (substr($vals[1], 0, 1) == "3") {
-                    $version = 3;
-                }
+                $version = substr($vals[1], 0, 1);
             }
         }
     }
@@ -324,6 +324,13 @@ function getData3($statusFile)
     return $retArray;
 }
 
+
+// parse nagios4 status.dat
+function getData4($statusFile)
+{
+    // For now just re-use the nagios3 parsing
+    return getData3($statusFile);
+}
 
 // this formats the age of a check in seconds into a nice textual description
 function ageString($seconds)
