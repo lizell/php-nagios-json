@@ -40,14 +40,16 @@ if ($nag_version == 4) {
 
 $hosts = $data['hosts'];
 $services = $data['services'];
+$hostcomment = $data['hostcomment'];
+$servicecomment = $data['servicecomment'];
 $program = "";
 if (array_key_exists("program", $data)) {
     $program = $data['program'];
 }
 
-outputJson($hosts, $services, $program);
+outputJson($hosts, $services, $hostcomment, $servicecomment, $program);
 
-function outputJson($hosts, $services, $program)
+function outputJson($hosts, $services, $hostcomment, $servicecomment, $program)
 {
     // begin outputting XML
     header("Content-type: application/json");
@@ -62,6 +64,41 @@ function outputJson($hosts, $services, $program)
         unset($key, $val);
         echo '  },' . "\n";
     }
+// Host comments
+    if ($hostcomment != "") {
+		echo '  "hostcomment": {' . "\n";
+		foreach ($hostcomment as $hostName => $hostcommentArray) {
+			echo '   "' . jsonString($hostName) . '": {' . "\n";
+			foreach ($hostcommentArray as $key => $val) {
+				echo '      "' . jsonString($key) . '": "' . jsonString($val) . '"' . (isLast($hostcommentArray, $key) ? '' : ',') . "\n";
+			}
+			unset($key, $val);
+			echo '   }' . (isLast($hostcomment, $hostName) ? '' : ',') . "\n";
+		}
+		unset($hostName, $hostcommentArray);
+		echo '  },' . "\n";	
+    }
+	
+	// Service comments
+    if ($servicecomment != "") {
+		echo '  "servicecomment": {' . "\n";
+		foreach ($servicecomment as $hostName => $servicecomments) {
+			echo '   "' . jsonString($hostName) . '": {' . "\n";
+			foreach ($servicecomments as $servicecommentDesc => $servicecommentArray) {
+				echo '   "' . jsonString($servicecommentDesc) . '": {' . "\n";
+				foreach ($servicecommentArray as $key => $val) {
+					echo '      "' . jsonString($key) . '": "' . jsonString($val) . '"' . (isLast($servicecommentArray, $key) ? '' : ',') . "\n";
+				}
+				unset($key, $val);
+				echo '   }' . (isLast($servicecomments, $servicecommentDesc) ? '' : ',') . "\n";
+			}
+			echo '   }' . (isLast($servicecomment, $hostName) ? '' : ',') . "\n";
+			unset($servicecommentDesc, $servicecommentArray);
+		}
+		unset($hostName, $servicecomments);
+		echo '  },' . "\n";
+    }
+	
 
     // hosts
     echo '  "hosts": {' . "\n";
@@ -255,6 +292,8 @@ function getData3($statusFile)
 
     $hostStatus = array();
     $serviceStatus = array();
+    $hostCommentStatus = array();
+    $serviceCommentStatus = array();
     $programStatus = array();
 
     #variables for total hosts and services
@@ -295,7 +334,11 @@ function getData3($statusFile)
                 $serviceStatus[$sectionData['host_name']][$sectionData['service_description']] = $sectionData;
             } elseif ($sectionType == "hoststatus") {
                 $hostStatus[$sectionData["host_name"]] = $sectionData;
-            } elseif ($sectionType == "programstatus") {
+            } elseif ($sectionType == "hostcomment") {
+                $hostCommentStatus[$sectionData["host_name"]] = $sectionData;
+			} elseif ($sectionType == "servicecomment") {
+                $serviceCommentStatus[$sectionData["host_name"]][$sectionData["service_description"]] = $sectionData;
+			} elseif ($sectionType == "programstatus") {
                 $programStatus = $sectionData;
             }
             $inSection = false;
@@ -307,7 +350,7 @@ function getData3($statusFile)
             $lineVal = substr($line, strpos($line, "=") + 1);
 
             // add to the array as appropriate
-            if ($sectionType == "servicestatus" || $sectionType == "hoststatus" || $sectionType == "programstatus") {
+            if ($sectionType == "servicestatus" || $sectionType == "hoststatus" || $sectionType == "hostcomment" || $sectionType == "servicecomment" || $sectionType == "programstatus") {
                 if ($debug) {
                     echo "LINE " . $lineNum . ": lineKey=" . $lineKey . "= lineVal=" . $lineVal . "=\n";
                 }
@@ -320,7 +363,7 @@ function getData3($statusFile)
 
     fclose($fh);
 
-    $retArray = array("hosts" => $hostStatus, "services" => $serviceStatus, "program" => $programStatus);
+    $retArray = array("hosts" => $hostStatus, "services" => $serviceStatus, "hostcomment" => $hostCommentStatus, "servicecomment" => $serviceCommentStatus, "program" => $programStatus);
     return $retArray;
 }
 
