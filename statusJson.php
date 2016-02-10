@@ -77,22 +77,21 @@ function outputJson($hosts, $services, $program)
     echo '  },' . "\n";
 
     // loop through the services
-    echo '  "services": {' . "\n";
+    echo '  "services": [' . "\n";
     foreach ($services as $hostName => $service) {
-        echo '   "' . jsonString($hostName) . '": {' . "\n";
         foreach ($service as $serviceDesc => $serviceArray) {
-            echo '   "' . jsonString($serviceDesc) . '": {' . "\n";
+            echo '   {' . "\n";
+            echo '      "service_name": "' . jsonString($serviceDesc) . '",' . "\n";
             foreach ($serviceArray as $key => $val) {
                 echo '      "' . jsonString($key) . '": "' . jsonString($val) . '"' . (isLast($serviceArray, $key) ? '' : ',') . "\n";
             }
             unset($key, $val);
-            echo '   }' . (isLast($service, $serviceDesc) ? '' : ',') . "\n";
+            echo '   }' . (isLast($service, $serviceDesc) && isLast($services, $hostName) ? '' : ',') . "\n";
         }
-        echo '   }' . (isLast($services, $hostName) ? '' : ',') . "\n";
         unset($serviceDesc, $serviceArray);
     }
     unset($hostName, $service);
-    echo '  }' . "\n";
+    echo '  ]' . "\n";
     echo "}";
 }
 
